@@ -132,7 +132,26 @@ android {
     }
 }
 
+// Error fix: "java.lang.NoSuchMethodError: No virtual method zzBM()Lcom/google/android/gms/dynamic/LifecycleDelegate; in class Lcom/google/android/gms/maps/MapView$zzb;"
+// Found here: https://github.com/airbnb/react-native-maps/issues/249
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'com.google.android.gms'
+            && ( (details.requested.name == 'play-services-base') || (details.requested.name == 'play-services-maps') ) ) {
+            details.useVersion '11.0.2'
+        }
+    }
+}
+
 dependencies {
+    compile project(':react-native-maps')
+    compile(project(':react-native-maps')) {
+        exclude group: 'com.google.android.gms', module: 'play-services-base'
+        exclude group: 'com.google.android.gms', module: 'play-services-maps'
+    }
+    compile 'com.google.android.gms:play-services-base:10.2.0'
+    compile 'com.google.android.gms:play-services-maps:10.2.0'
+
     compile project(':react-native-i18n')
     compile project(':react-native-vector-icons')
     compile project(':react-native-device-info')
